@@ -8,6 +8,7 @@ This is a system for controlling a PGA4311 or PGA2311 with an Arduino.
  * Rotary encoder volume control with push button mute
  * Control of PGA4311 or PGA2311 volume controllers
  * EEPROM volume save state
+ * Delayed save to EEPROM to prevent rewrites after every changes volume
  * Volume scaling function for smoother volume transitions
  * Limiting on maximum volume for PGA4311 control registers
  * Digital I/O used: 6 pins

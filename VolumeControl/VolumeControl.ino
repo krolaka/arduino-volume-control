@@ -23,6 +23,8 @@
 // (192 is 0 dB -- e.g. no gain)
 #define maximumVolume          192
 
+#define delayWriteEEPROM       10000000 // Approximately 1 minute
+
 /*
  * Includes, variables and some options
  */
@@ -37,6 +39,10 @@ long      newVolumePosition;
 long      tempVolume;
 byte      baseVolume;
 long int  delayTimeout;
+
+// Another variables
+unsigned long  writeEEPROMCounter = 0;
+boolean delayedWriteEEPROMActive = false;
 
 /*
  * Inline function to write a byte to the PGA4311
@@ -166,7 +172,19 @@ void setup(){
 
   // Reset the encoder monitor
   volumeKnob.write(0);
+}
 
+/*
+ * Delayed write to EEPROM. Prevent rewrites EEPROM after every changes.
+ */
+
+void delayedWriteEEPROM(){
+  if(writeEEPROMCounter > delayWriteEEPROM){
+    EEPROM.write(0, baseVolume);
+    Serial.println("Saved to EEPROM");
+    writeEEPROMCounter=0;
+    delayedWriteEEPROMActive = false;
+  }
 }
 
 /*
@@ -202,7 +220,9 @@ void loop(){
         }
         else{
           // Save the volume setting
-          EEPROM.write(0,baseVolume);
+          delayedWriteEEPROMActive = true;
+          writeEEPROMCounter = 0;
+          delayedWriteEEPROM();
 
           // Print it out for debug
           Serial.print(31.5-((255-(float)baseVolume)/2));
@@ -218,6 +238,11 @@ void loop(){
     }
     else{
       volumeKnob.write(0);
+    }
+  }else{
+    if(delayedWriteEEPROMActive) {
+      writeEEPROMCounter++;
+      delayedWriteEEPROM();
     }
   }
 }
