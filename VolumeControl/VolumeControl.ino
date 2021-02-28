@@ -3,9 +3,7 @@
  * Copyright (c) 2013 - 2015, Colin Shaw
  * Distributed under the terms of the MIT License
  */
- 
- 
- 
+
  /*
   * General pin definitions
   */
@@ -39,9 +37,6 @@ long      newVolumePosition;
 long      tempVolume;
 byte      baseVolume;
 long int  delayTimeout;
-
-// Other variables
-int       isMuted =          false;            // Internally used status for mute state
 
 /*
  * Inline function to write a byte to the PGA4311
@@ -152,7 +147,6 @@ void setup(){
   setVolume(0);
 
   baseVolume=EEPROM.read(0);
-
   tempVolume=baseVolume;
 
   Serial.print("Setting initial volume to (byte value) ");
@@ -190,13 +184,6 @@ void loop(){
 
     // This section delays the encoder to make it feel better for user experience
       if(millis()-delayTimeout>5){
-
-        // Unmute to last volume if the volume is changed
-        if(isMuted==true){
-          Serial.println("Unmuting...");
-          scaleVolume(0,baseVolume,50);
-        }
-        isMuted=false;
 
         // Grab knob differential value and enforce volume bounds
         tempVolume+=newVolumePosition;
